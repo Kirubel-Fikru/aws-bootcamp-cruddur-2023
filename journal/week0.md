@@ -38,9 +38,8 @@ Blogging app, Ephemeral, cloud native, Targeted to busy professional, no permane
 	* 	[Further services included in Free Tier](https://aws.amazon.com/free/?all-free-tier.sort-by=item.additionalFields.SortRank&all-free-tier.sort-order=asc&awsf.Free%20Tier%20Types=*all&awsf.Free%20Tier%20Categories=*all&awsm.page-all-free-tier=2)
 
 
-
 ## Architecture
-**TOGAF?**
+**TOGAF???**
 Togaf is an architecture framework that provides the methods and tools for assisting in the acceptance, production, use, and maintenance of an enterprise architecture. It is based on an iterative process model supported by best practices and a re-usable set of existing architecture assets"
 * The most popular framework for Enterprose architecture
 * Common dictionary of words to convey desired outcomes 
