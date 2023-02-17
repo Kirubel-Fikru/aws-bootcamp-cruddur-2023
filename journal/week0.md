@@ -56,4 +56,8 @@ Togaf is an architecture framework that provides the methods and tools for assis
 ### Recreate Logical Architectual Diagram in Lucid Charts
 [Cruddur Logical Diagram Lucid Chart Link](https://lucid.app/lucidchart/09c65293-0934-455d-8724-812ffd153769/edit?viewport_loc=-204%2C113%2C2493%2C1148%2C0_0&invitationId=inv_ea101dd5-504a-48d4-bd08-97403860066c)
 
+![Logical Diagram](../screenshots/Logical%20Diagram.PNG)]
+![Low Fidelity Conceptual Diagram](../screenshots/Low%20fidelity%20conceptual%20diagram.jpg)]
+
+
 
