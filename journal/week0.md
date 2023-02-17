@@ -59,7 +59,7 @@ Togaf is an architecture framework that provides the methods and tools for assis
 ### Logical Diagram
 ![Logical Diagram](../screenshots/Logical%20Diagram.PNG)]
 ### Low Fidelity Conceptual Diagram
-![Low Fidelity Conceptual Diagram](../screenshots/Low%20fidelity%20conceptual%20diagram.jpg)]
+![Low Fidelity Conceptual Diagram](../screenshots/Low%20fidelity%20conceptual%20diagram.jpg)
 
 
 
