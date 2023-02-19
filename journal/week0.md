@@ -68,5 +68,38 @@ Togaf is an architecture framework that provides the methods and tools for assis
 	* 	750 hours per month of amazon open search service
 	* 	[Further services included in Free Tier](https://aws.amazon.com/free/?all-free-tier.sort-by=item.additionalFields.SortRank&all-free-tier.sort-order=asc&awsf.Free%20Tier%20Types=*all&awsf.Free%20Tier%20Categories=*all&awsm.page-all-free-tier=2)
 
+## Security Considerations : Day - 0
+* The role of cyber securuty in any organization is to identify and inform the business on any technical risk that the business maybe exposed to.
+#### Cloud security 
+Cloud security, also known as cloud computing security, is a collection of security measures designed to protect cloud-based infrastructure, applications, and data. These measures ensure user and device authentication, data and resource access control, and data privacy protection.
+
+#### Add MFA to Root User
+* Root user = God mode
+* MFA - Multi Factor Authentication
+* Cloud Shell - Built in CLI to manage infrastructure and edit code online for cloud development.
+* SCP - Service control policies (SCPs) are a type of organization policy that you can use to manage permissions in your organization. SCPs offer central control over the maximum available permissions for all accounts in your organization.
+
+For increased security, it is recommend that we configure multi-factor authentication (MFA) to help protect our AWS resources. You can enable MFA for the AWS account root user and IAM users.
+[Documentation: How To Enable Multi Factor Authentication For A User](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html)
+
+#### Aws organizational Units 
+You can use organizational units (OUs) to group accounts together to administer as a single unit. This greatly simplifies the management of your accounts.
+For example, you can attach a policy-based control to an OU, and all accounts within the OU automatically inherit the policy. You can create multiple OUs within a single organization, and you can create OUs within other OUs. Each OU can contain multiple accounts, and you can move accounts from one OU to another. However, OU names must be unique within a parent OU or root.
+
+[Documentaion: Managing AWS Oraganizational Units](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_ous.html)
+ #### AWS CloudTrail
+AWS CloudTrail monitors and records account activity across your AWS infrastructure, giving you control over storage, analysis, and remediation actions.
+
+### Cloud Trail log created successfully 
+![CloudTrail Log](../screenshots/CloudTrail%20Log.PNG)
+
+#### AWS IAM Users
+An IAM user is a resource in IAM that has associated credentials and permissions. An IAM user can represent a person or an application that uses its credentials to make AWS requests. This is typically referred to as a service account.
+#### AWS IAM Roles
+AWS Identity and Access Management (IAM) roles are entities you create and assign specific permissions to that allow trusted identities such as workforce identities and applications to perform actions in AWS. When your trusted identities assume IAM roles, they are granted only the permissions scoped by those IAM roles.
+
+IAM Roles manage who has access to your AWS resources, whereas IAM policies control their permissions. A Role with no Policy attached to it won't have to access any AWS resources. A Policy that is not attached to an IAM role is effectively unused.
+
+**The principle of least privilege (PoLP) is an information security concept which maintains that a user or entity should only have access to the specific data, resources and applications needed to complete a required task.**
 
 
