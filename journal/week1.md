@@ -1,59 +1,298 @@
 # Week 1 — App Containerization
 
-## Business Scenario
+## References
 
-Your company has received the code repositories for the demo application from the contracted web-development firm. The company wants you to investigate the codebases, and ensure you can get them running.
+Good Article for Debugging Connection Refused
+https://pythonspeed.com/articles/docker-connection-refused/
 
-The fractional CTO has suggested we first begin containerizing the applications for both developer and production use, and their reasons stayed why:
 
-● To avoid lack of documentation of application and OS configuration
-● To ensure the effort of application and OS configuration is factored in before investing lots of feature development
-● If we decide to hire our technical team members we can quickly replicate these environments in any preferred choice.
+## VSCode Docker Extension
 
-The fractional CTO has asked that everything be developed in Gitpod, (a Cloud Developer Environment). This will allow the CTO at a press of a button launch the developer environment in a clean state to help with any tricky or emergency implementations, and ensure developer accountability.
+Docker for VSCode makes it easy to work with Docker
 
-Gitpod was since it supports multiple Version Control Services (VCS).. The company has invested considerable effort already in Atlassian JIRA working with the web-dev firm, and repo’s highly likely might be moved to Atlassian BitBucket to take advantage of better integrations within the Atlassian’s ecosystem.
+https://code.visualstudio.com/docs/containers/overview
 
-##  Dockerfile
+> Gitpod is preinstalled with theis extension
 
+## Containerize Backend
+
+### Run Python
+
+```sh
+cd backend-flask
+export FRONTEND_URL="*"
+export BACKEND_URL="*"
+python3 -m flask run --host=0.0.0.0 --port=4567
+cd ..
 ```
+
+- make sure to unlock the port on the port tab
+- open the link for 4567 in your browser
+- append to the url to `/api/activities/home`
+- you should get back json
+
+
+
+### Add Dockerfile
+
+Create a file here: `backend-flask/Dockerfile`
+
+```dockerfile
 FROM python:3.10-slim-buster
-#This line sets the base image for the Docker image we're building to python:3.10-slim-buster.
-#This is a slimmed-down version of the official Python 3.10 image, based on the Debian "Buster" distribution.
+
 WORKDIR /backend-flask
-# This line sets the working directory for the Docker container to /backend-flask.
+
 COPY requirements.txt requirements.txt
-# This line copies the requirements.txt file from the host machine to the working directory in the Docker container.
 RUN pip3 install -r requirements.txt
-# This line installs the Python packages listed in requirements.txt using pip3.
 
 COPY . .
-# This line copies all the files and directories from the host machine to the working directory in the Docker container.
+
 ENV FLASK_ENV=development
-#This line sets the FLASK_ENV environment variable to development.
+
 EXPOSE ${PORT}
-# Exposes the port specified by the ${PORT} environment variable. 
-# Note that this line does not actually publish the port to the host machine; that is done when the container is run.
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=4567"]
-# This line specifies the default command to run when the Docker container is started. 
-# In this case, it runs the Flask application using python3 and the flask run command, with the host set to 0.0.0.0 and the port set to 4567.
 ```
 
-## Build Container
-`docker build -t backend-flask ./backend-flask`
+### Build Container
 
-* **docker build**: This is the Docker command that we're running.
-* **-t backend-flask**: This option sets the name of the Docker image that we're building to backend-flask.
-* .**/backend-flask**: This specifies the build context, which is the directory that contains the Dockerfile and any other files needed to build the Docker image. In this case, the build context is ./backend-flask, which means that Docker will look for the Dockerfile in the backend-flask directory.
+```sh
+docker build -t  backend-flask ./backend-flask
+```
+
+### Run Container
+
+Run 
+```sh
+docker run --rm -p 4567:4567 -it backend-flask
+FRONTEND_URL="*" BACKEND_URL="*" docker run --rm -p 4567:4567 -it backend-flask
+export FRONTEND_URL="*"
+export BACKEND_URL="*"
+docker run --rm -p 4567:4567 -it -e FRONTEND_URL='*' -e BACKEND_URL='*' backend-flask
+docker run --rm -p 4567:4567 -it  -e FRONTEND_URL -e BACKEND_URL backend-flask
+unset FRONTEND_URL="*"
+unset BACKEND_URL="*"
+```
+
+Run in background
+```sh
+docker container run --rm -p 4567:4567 -d backend-flask
+```
+
+Return the container id into an Env Vat
+```sh
+CONTAINER_ID=$(docker run --rm -p 4567:4567 -d backend-flask)
+```
+
+> docker container run is idiomatic, docker run is legacy syntax but is commonly used.
+
+### Get Container Images or Running Container Ids
+
+```
+docker ps
+docker images
+```
 
 
-![Docker Build](../screenshots/docker%20build.png)
+### Send Curl to Test Server
 
-## Run Container
-`docker run --rm -p 4567:4567 -it backend-flask`
+```sh
+curl -X GET http://localhost:4567/api/activities/home -H "Accept: application/json" -H "Content-Type: application/json"
+```
 
-* **docker run**: This is the Docker command that we're running. 
-* **--rm**: This option tells Docker to automatically remove the container when it stops running. This can help prevent clutter from accumulating on your system.
-* **-p 4567:4567**: This option maps the container's port 4567 to the host machine's port 4567. This allows you to access the container's web server from your host machine's web browser.
-* **-it**: This option tells Docker to run the container in interactive mode and allocate a pseudo-TTY. This allows you to interact with the container's shell and see its output in your terminal.
-* **backend-flask**: This is the name of the Docker image that you want to run.
+### Check Container Logs
+
+```sh
+docker logs CONTAINER_ID -f
+docker logs backend-flask -f
+docker logs $CONTAINER_ID -f
+```
+
+###  Debugging  adjacent containers with other containers
+
+```sh
+docker run --rm -it curlimages/curl "-X GET http://localhost:4567/api/activities/home -H \"Accept: application/json\" -H \"Content-Type: application/json\""
+```
+
+busybosy is often used for debugging since it install a bunch of thing
+
+```sh
+docker run --rm -it busybosy
+```
+
+### Gain Access to a Container
+
+```sh
+docker exec CONTAINER_ID -it /bin/bash
+```
+
+> You can just right click a container and see logs in VSCode with Docker extension
+
+### Delete an Image
+
+```sh
+docker image rm backend-flask --force
+```
+
+> docker rmi backend-flask is the legacy syntax, you might see this is old docker tutorials and articles.
+
+> There are some cases where you need to use the --force
+
+### Overriding Ports
+
+```sh
+FLASK_ENV=production PORT=8080 docker run -p 4567:4567 -it backend-flask
+```
+
+> Look at Dockerfile to see how ${PORT} is interpolated
+
+## Containerize Frontend
+
+## Run NPM Install
+
+We have to run NPM Install before building the container since it needs to copy the contents of node_modules
+
+```
+cd frontend-react-js
+npm i
+```
+
+### Create Docker File
+
+Create a file here: `frontend-react-js/Dockerfile`
+
+```dockerfile
+FROM node:16.18
+
+ENV PORT=3000
+
+COPY . /frontend-react-js
+WORKDIR /frontend-react-js
+RUN npm install
+EXPOSE ${PORT}
+CMD ["npm", "start"]
+```
+
+### Build Container
+
+```sh
+docker build -t frontend-react-js ./frontend-react-js
+```
+
+### Run Container
+
+```sh
+docker run -p 3000:3000 -d frontend-react-js
+```
+
+## Multiple Containers
+
+### Create a docker-compose file
+
+Create `docker-compose.yml` at the root of your project.
+
+```yaml
+version: "3.8"
+services:
+  backend-flask:
+    environment:
+      FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+    build: ./backend-flask
+    ports:
+      - "4567:4567"
+    volumes:
+      - ./backend-flask:/backend-flask
+  frontend-react-js:
+    environment:
+      REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+    build: ./frontend-react-js
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend-react-js:/frontend-react-js
+
+# the name flag is a hack to change the default prepend folder
+# name when outputting the image names
+networks: 
+  internal-network:
+    driver: bridge
+    name: cruddur
+```
+
+## Adding DynamoDB Local and Postgres
+
+We are going to use Postgres and DynamoDB local in future labs
+We can bring them in as containers and reference them externally
+
+Lets integrate the following into our existing docker compose file:
+
+### Postgres
+
+```yaml
+services:
+  db:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+volumes:
+  db:
+    driver: local
+```
+
+To install the postgres client into Gitpod
+
+```sh
+  - name: postgres
+    init: |
+      curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc|sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
+      echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |sudo tee  /etc/apt/sources.list.d/pgdg.list
+      sudo apt update
+      sudo apt install -y postgresql-client-13 libpq-dev
+```
+
+### DynamoDB Local
+
+```yaml
+services:
+  dynamodb-local:
+    # https://stackoverflow.com/questions/67533058/persist-local-dynamodb-data-in-volumes-lack-permission-unable-to-open-databa
+    # We needed to add user:root to get this working.
+    user: root
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+```
+
+Example of using DynamoDB local
+https://github.com/100DaysOfCloud/challenge-dynamodb-local
+
+## Volumes
+
+directory volume mapping
+
+```yaml
+volumes: 
+- "./docker/dynamodb:/home/dynamodblocal/data"
+```
+
+named volume mapping
+
+```yaml
+volumes: 
+  - db:/var/lib/postgresql/data
+
+volumes:
+  db:
+    driver: local
+```
